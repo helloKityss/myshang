@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties>
+		<property name="dialect" value="mysql" />
+        <property name="pageSqlId" value=".*Page$" />
+	</properties>
+	<settings>
+		<!-- 这个配置使全局的映射器启用或禁用缓存 -->
+		<setting name="cacheEnabled" value="true" />
+		<!-- 对于未知的SQL查询，允许返回不同的结果集以达到通用的效果 -->
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<!-- 配置默认的执行器。SIMPLE 执行器没有什么特别之处。REUSE 执行器重用预处理语句。BATCH 执行器重用语句和批量更新 -->
+		<setting name="defaultExecutorType" value="REUSE" />
+		<!-- 开启数据库与驼峰命名规范映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+		<!-- 全局启用或禁用延迟加载。当禁用时，所有关联对象都会即时加载。 -->
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="aggressiveLazyLoading" value="false" />
+		<!-- <setting name="enhancementEnabled" value="true"/> -->
+		<!-- 设置超时时间，它决定驱动等待一个数据库响应的时间。 -->
+		<setting name="defaultStatementTimeout" value="25000" />
+		<!-- 配置log4j日志打印 -->
+		<setting name="logImpl" value="LOG4J" />
+	</settings>
+	
+	<!-- 命名空间 -->
+	<typeAliases>
+	   <!-- 分页参数使用的类 -->
+	   <typeAlias alias="Page" type="com.myshang.server.common.Page"/>
+   	   <typeAlias alias="User" type="com.myshang.server.user.model.User"/>
+   	   <typeAlias alias="Business" type="com.myshang.server.business.model.Business"/>
+   	   <typeAlias alias="Department" type="com.myshang.server.department.model.Department"/>
+	   <typeAlias alias="Role" type="com.myshang.server.role.model.Role"/>
+  	   <typeAlias alias="Messages" type="com.myshang.server.messages.model.Messages"/> 	      
+   	   <typeAlias alias="Reward" type="com.myshang.server.reward.model.Reward"/>
+   	   <typeAlias alias="Qrcode" type="com.myshang.server.qrcode.model.Qrcode"/>
+   	   <typeAlias alias="Label" type="com.myshang.server.label.model.Label"/>
+   	   <typeAlias alias="RoomRuning" type="com.myshang.server.roomRuning.model.RoomRuning"/>
+   	   <typeAlias alias="VicePrincess" type="com.myshang.server.vicePrincess.model.VicePrincess"/>
+	   <typeAlias alias="IncomeRecord" type="com.myshang.server.incomeRecord.model.IncomeRecord"/>
+  	   <typeAlias alias="WithdrawRecord" type="com.myshang.server.withdrawRecord.model.WithdrawRecord"/>
+       <typeAlias alias="Account" type="com.myshang.server.account.model.Account"/>
+       <typeAlias alias="Precious" type="com.myshang.server.preciousCategory.model.Precious"/>
+       <typeAlias alias="PreciousSale" type="com.myshang.server.preciousSale.model.PreciousSale"/>
+       <typeAlias alias="Room" type="com.myshang.server.room.model.Room"/>
+       <typeAlias alias="Attendance" type="com.myshang.server.attendance.model.Attendance"/>
+       <typeAlias alias="Bankcard" type="com.myshang.server.bankcard.model.Bankcard"/>
+       <typeAlias alias="Login" type="com.myshang.server.login.model.Login"/>
+       <typeAlias alias="Distribution" type="com.myshang.server.distribution.model.Distribution"/>
+       <typeAlias alias="Extenduser" type="com.myshang.server.extenduser.model.Extenduser"/>
+       <typeAlias alias="RoomRecord" type="com.myshang.server.roomRecord.model.RoomRecord"/>
+       <typeAlias alias="IncomeBusiness" type="com.myshang.server.Incomebusiness.model.IncomeBusiness"/>
+   	   </typeAliases>
+	<!-- 分页插件 -->
+	<plugins>
+	   <plugin interceptor="com.myshang.server.sys.PageInterceptor" />
+	</plugins>
+
+	<!-- 映射map -->
+	<mappers>
+	</mappers>
+</configuration>

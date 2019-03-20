@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.attendance.dao.AttendanceDao">
+
+    <resultMap type="Attendance" id="AttendanceMap">
+        <id property="attid" column="attid"/>
+        <result property="userId" column="userId"/>
+        <result property="attendType" column="attendType"/>
+        <result property="attendTime" column="attendTime"/>
+        <result property="belongBusid" column="belongBusid"/>
+        <result property="belongDepid" column="belongDepid"/>
+    </resultMap>
+    <insert id="addAttendance" parameterType="Attendance">
+        INSERT INTO attendance(userId,attendType,attendTime,belongBusid,belongDepid)
+        VALUES(#{userId},#{attendType},#{attendTime},#{belongBusid},#{belongDepid})
+    </insert>
+   	<select id="getAttendanceCount" resultType="int">
+		SELECT
+			COUNT( distinct n.userId ) 
+		FROM
+			attendance AS n 
+		WHERE
+			n.belongDepid = #{belongDepid}
+			AND n.attendType = 1 
+			AND attendTime like '%${attendTime}%'
+    </select>
+   	<select id="getDayAttendance" resultType="com.myshang.server.user.model.User">
+		select u.userName,uid from user_info as u left join department as d on u.belongDepid = d.depid where u.belongDepid = #{belongDepid} and u.hasRegister!=0 and u.isOnline=1
+    </select>
+	<select id="getAttendancego" resultType="String">
+		SELECT
+			MIN(date_format( n.attendTime, '%H:%i:%s' )) AS attendTime 
+		FROM
+			attendance AS n 
+		WHERE
+			n.attendType = 1 
+			AND n.userId = #{userId}
+			AND attendTime like '%${attendTime}%'
+    </select>
+    <select id="getAttendanceoff" resultType="String">
+		SELECT
+			MAX(date_format( n.attendTime, '%H:%i:%s' )) AS attendTime 
+		FROM
+			attendance AS n 
+		WHERE
+			n.attendType = 2 
+			AND n.userId = #{userId}
+			AND DATE_FORMAT(n.attendTime,'%Y%m%d') = DATE_FORMAT(#{attendTime},'%Y%m%d')+1
+    </select>
+    <select id="getPunchCount" resultType="int">
+        SELECT
+			COUNT( DISTINCT t.userId ) 
+		FROM
+			attendance t 
+		WHERE
+			t.belongBusid = #{belongBusid} 
+			AND t.attendType = 1 <if test="belongDepid!=0">AND t.belongDepid=#{belongDepid}</if>
+			AND DATE_FORMAT( t.attendTime, '%Y%m%d%H%i%s' ) BETWEEN DATE_FORMAT( now( ), '%Y%m%d120000' ) - 1000000 
+			AND DATE_FORMAT( now( ), '%Y%m%d150000' )
+    </select>
+    <select id="getOwnAttendance" resultMap="AttendanceMap">
+		SELECT n.*,u.userName as departName,date_format(n.attendTime,'%Y-%m-%d')as formatTime from attendance as n left JOIN user_info as u on u.uid=n.userId where n.userId=#{userId} AND n.attendType=1 and u.hasRegister!=0 and u.isOnline=1 GROUP BY formatTime
+    </select>
+    <select id="getTwoAttendance" resultType="String">
+		SELECT  MIN(n.attendTime) AS attendTime  from attendance as n where n.userId=#{userId} AND n.attendType=1 AND n.attendTime like '%${formatTime}%'
+    </select>
+    <select id="getThreeAttendance" resultType="String">
+		SELECT  MAX(n.attendTime) AS attendTime from attendance as n where n.userId=#{userId} AND n.attendType=2 AND DATE_FORMAT(n.attendTime,'%Y%m%d') = DATE_FORMAT(#{formatTime},'%Y%m%d')+1
+    </select>
+    <delete id="deleteAttendance" parameterType="int">
+		delete from attendance where userId =#{userId}
+    </delete>
+    <select id="getRanking" resultType="integer">
+		SELECT
+			count(n.userId) AS count
+		FROM
+			attendance n
+		WHERE
+			n.attendType = 1 
+			AND n.userId=#{userId}
+			AND DATE_FORMAT( n.attendTime, '%Y%m' ) = DATE_FORMAT( CURDATE( ), '%Y%m' ) 
+		ORDER BY count desc
+    </select>
+    <select id="getDepartRanking" resultType="int">
+		SELECT
+			IFNULL(count(n.userId),0)AS count
+		FROM
+			attendance n
+		WHERE
+			n.attendType = 1
+			AND n.userId=#{userId}
+			and DATE_FORMAT(n.attendTime,'%Y%m') = #{attendTime}
+		ORDER BY count desc
+    </select>
+    <select id="getDepartdayRanking" resultType="int">
+		SELECT
+			IFNULL(count(n.userId),0)AS count
+		FROM
+			attendance n
+		WHERE
+			n.attendType = 1
+			AND n.userId=#{userId}
+			and DATE_FORMAT(n.attendTime,'%Y%m%d') BETWEEN #{beforeTime} and #{afterTime}
+		ORDER BY count desc
+    </select>
+</mapper>

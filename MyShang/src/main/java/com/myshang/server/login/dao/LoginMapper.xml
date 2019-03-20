@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.login.dao.LoginDao">
+
+    <resultMap type="Login" id="LoginMap">
+        <id property="logid" column="logid"/>
+        <result property="loginName" column="loginName"/>
+        <result property="password" column="password"/>
+        <result property="loginType" column="loginType"/>
+        <result property="belongBusid" column="belongBusid"/>
+    </resultMap>
+    <select id="login" resultMap="LoginMap">
+		SELECT n.* FROM login as n where n.loginName=#{loginName}
+    </select>
+    <insert id="createlogin" parameterType="Login">
+     	insert into login(loginName,password,loginType,belongBusid) values(#{loginName},#{password},#{loginType},#{belongBusid})    
+    </insert>
+    <update id="updatelogin" parameterType="Login">
+		update login set loginName=#{loginName},password=#{password},loginType=#{loginType} where belongBusid =#{belongBusid}
+    </update>
+    <delete id="deletelogin" parameterType="int">
+		delete from login where belongBusid =#{belongBusid}
+    </delete>
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.distribution.dao.DistributionDao">
+	<resultMap type="Distribution" id="DistributionMap">
+		<id property="distid" column="distid" />
+		<result property="belongBusid" column="belongBusid" />
+		<result property="weixin" column="weixin" />
+		<result property="platform" column="platform" />
+		<result property="extend" column="extend" />
+		<result property="business" column="business" />
+		<result property="internal" column="internal" />
+		<result property="mami" column="mami" />
+		<result property="princess" column="princess" />
+		<result property="range" column="range" />
+	</resultMap>
+   	<select id="getDistribution" resultMap="DistributionMap">
+		SELECT n.* FROM distribution as n where n.belongBusid=#{belongBusid}
+    </select>
+    <insert id="saveDistribution" parameterType="Distribution">
+     	insert into distribution(belongBusid,weixin,platform,extend,business,internal,mami,princess)
+     	values(#{belongBusid},#{weixin},#{platform},#{extend},#{business},#{internal},#{mami},#{princess})    
+    </insert>
+   	<select id="getdistributions" resultType="HashMap">
+		SELECT n.*,b.extendUserId,u.userName,b.businessName FROM business as b left join distribution as n on n.belongBusid=b.busid left join user_info as u on b.extendUserId=u.uid where b.busid!=0
+    </select>
+    <delete id="deletedistribution" parameterType="int">
+		delete from distribution where distid =#{distid}
+    </delete>
+    <update id="updatedistribution" parameterType="Distribution">
+		update distribution set platform=#{platform},extend=#{extend} where distid =#{distid}
+    </update>
+   	<select id="getdistributionId" resultMap="DistributionMap">
+		SELECT n.* FROM distribution as n where n.distid=#{distid}
+    </select>
+   	<select id="getbusdistribution" resultMap="DistributionMap">
+		SELECT n.* FROM distribution as n where n.belongBusid=#{belongBusid}
+    </select>
+   	<update id="updatbusedistribution" parameterType="Distribution">
+		update distribution set business=#{business},internal=#{internal},mami=#{mami},princess=#{princess} where distid =#{distid}
+    </update>
+</mapper>

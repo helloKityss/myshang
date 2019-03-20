@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.messages.dao.MessagesDao">
+
+    <resultMap type="Messages" id="messagesMap">
+        <id property="mesid" column="mesid"/>
+        <result property="messageType" column="messageType"/>
+        <result property="messageContent" column="messageContent"/>
+        <result property="labelSet" column="labelSet"/>
+        <result property="messageState" column="messageState"/>
+        <result property="createTime" column="createTime"/>
+        <result property="issueUserId" column="issueUserId"/>
+        <result property="complainId" column="complainId"/>
+        <result property="roomName" column="roomName"/>
+        <result property="businessId" column="businessId"/>
+        <association property="user" column="issueUserId" select="com.myshang.server.user.dao.UserDao.findUserByUuid"/>
+    </resultMap>
+    
+    <select id="messagesList" resultMap="messagesMap">
+		SELECT n.*,date_format(n.createTime,'%Y-%m-%d %H:%i')as formatTime  FROM messages as n where
+		<![CDATA[ n.messageType > 3  ]]>
+		AND n.businessId =#{businessId}
+		AND  DATE_SUB(CURDATE(), INTERVAL #{querytime} DAY) <![CDATA[<=date(n.createTime)]]>
+		 ORDER BY n.createTime desc
+    </select>
+    <select id="getMessagesState" resultMap="messagesMap">
+		SELECT n.*,date_format(n.createTime,'%Y-%m-%d %H:%i')as formatTime FROM messages as n where n.messageType in(2,3) AND n.businessId =#{businessId} AND DATE_SUB(CURDATE(), INTERVAL #{querytime} DAY) <![CDATA[<=date(n.createTime)]]> ORDER BY n.createTime desc
+    </select>
+    <select id="getMessagesHang" resultMap="messagesMap">
+		SELECT n.*,date_format(n.createTime,'%Y-%m-%d %H:%i')as formatTime  FROM messages as n where n.messageType = 1 AND n.businessId =#{businessId} AND DATE_SUB(CURDATE(), INTERVAL #{querytime} DAY) <![CDATA[<=date(n.createTime)]]>  ORDER BY n.createTime desc
+    </select>
+    <insert id="createMessagesInfo" parameterType="Messages">
+        INSERT INTO messages(messageType,messageContent,
+        messageState,labelSet,createTime,issueUserId,complainId,roomName,businessId)
+        VALUES(#{messageType},#{messageContent},#{messageState},#{labelSet},
+        #{createTime},#{issueUserId},#{complainId},#{roomName},#{businessId})
+    </insert>
+    <update id="updateMessages" parameterType="Messages">
+		update messages set messageState=#{messageState} where mesid =#{mesid}
+    </update>
+    <delete id="deleteMessages" parameterType="int">
+		delete from messages where issueUserId =#{issueUserId}
+    </delete>
+</mapper>

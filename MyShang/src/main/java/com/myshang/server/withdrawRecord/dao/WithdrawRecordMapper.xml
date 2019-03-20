@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.withdrawRecord.dao.WithdrawRecordDao">
+
+    <resultMap type="WithdrawRecord" id="WithdrawRecordMap">
+        <id property="witid" column="witid"/>
+        <result property="userId" column="userId"/>
+        <result property="withdrawMoney" column="withdrawMoney"/>
+        <result property="withdrawTime" column="withdrawTime"/>
+        <result property="bankcardId" column="bankcardId"/>
+    </resultMap>
+    <select id="getWithdraw" resultMap="WithdrawRecordMap">
+		SELECT
+		n.*,
+		date_format( n.withdrawTime, '%Y.%m.%d' ) AS formatTime 
+		FROM
+			withdraw_record AS n 
+		WHERE
+			n.userId = #{userId}
+			and date_format( n.withdrawTime, '%Y-%m-%d' ) between #{startTime} and #{endTime}
+		  GROUP BY n.witid ORDER BY n.withdrawTime desc
+    </select>
+    <select id="getMorthWithdraw" resultMap="WithdrawRecordMap">
+		SELECT
+		n.*,
+		date_format( n.withdrawTime, '%Y.%m.%d' ) AS formatTime 
+		FROM
+			withdraw_record AS n 
+		WHERE
+			n.userId = #{userId}
+			and date_format( n.incomeTime, '%Y-%m-%d' )
+			<if test="Month!=0"><![CDATA[> DATE_SUB(CURDATE(), INTERVAL #{Month} MONTH)]]></if>
+		  GROUP BY n.witid ORDER BY n.withdrawTime desc
+    </select>
+   	<insert id="addWithdrawRecord" parameterType="WithdrawRecord">
+        INSERT INTO withdraw_record(userId,withdrawMoney,withdrawTime,bankcardId)
+        VALUES(#{userId},#{withdrawMoney},#{withdrawTime},#{bankcardId})
+    </insert>
+    <select id="queryExcel" resultType="hashMap">
+		select ww.witid, ww.userId, ww.bankcardId, ww.withdrawMoney, ww.withdrawTime, uu.phoneNumber, rr.roleName, bb.userName, bb.cardNumber, bb.bankName, bb.branchName from withdraw_record as ww
+		left join (select uid, phoneNumber, belongRolid from user_info) as uu
+		on ww.userId = uu.uid
+		left join (select rolid, roleName from role) as rr
+		on rr.rolid = uu.belongRolid
+		left join (select banid, userName, cardNumber, bankName, branchName from bankcard) as bb
+		on bb.banid = ww.bankcardId;
+    </select>
+    <select id="getSumWithdraw" resultType="java.math.BigDecimal">
+		SELECT
+			sum(n.withdrawMoney)
+		FROM
+			withdraw_record AS n 
+		WHERE
+			n.userId = #{userId} and DATE_SUB(CURDATE(), INTERVAL 7 DAY) <![CDATA[<=date(n.withdrawTime)]]>  GROUP BY n.userId
+    </select>
+    <select id="getWithdrawRecord" resultType="HashMap">
+		SELECT
+		date_format( n.withdrawTime, '%Y-%m-%d %H:%i' ) AS formatTime,
+			sum(n.withdrawMoney)  as withdrawMoney
+		FROM
+			withdraw_record AS n 
+		WHERE
+		n.userId = #{userId}  GROUP BY date_format( n.withdrawTime, '%Y.%m.%d' ) ORDER BY n.withdrawTime desc
+    </select>
+    <select id="getSumWithdrawMoney" resultType="java.math.BigDecimal">
+		SELECT
+			sum(n.withdrawMoney)
+		FROM
+			withdraw_record AS n 
+		WHERE
+			n.userId = #{userId} GROUP BY n.userId
+    </select>
+</mapper>

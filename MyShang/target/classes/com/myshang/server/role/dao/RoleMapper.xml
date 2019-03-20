@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.role.dao.RoleDao">
+
+    <resultMap type="Role" id="RoleMap">
+        <id property="rolid" column="rolid"/>
+        <result property="roleName" column="roleName"/>
+        <result property="powerValue" column="powerValue"/>
+        <result property="belongBusid" column="belongBusid"/>
+        <result property="belongDepid" column="belongDepid"/>
+        <result property="canProxyBusiness" column="canProxyBusiness"/>
+        <result property="canIssueTask" column="canIssueTask"/>
+        <result property="canSeeSale" column="canSeeSale"/>
+        <result property="canSeeRoomIncome" column="canSeeRoomIncome"/>
+        <result property="canSeeAttendance" column="canSeeAttendance"/>
+        <result property="canToReward" column="canToReward"/>
+        <result property="canBindPrincess" column="canBindPrincess"/>
+        <result property="canOpenRoom" column="canOpenRoom"/>
+        <result property="canBindPrinToRoom" column="canBindPrinToRoom"/>
+        <result property="canBeBindToRoom" column="canBeBindToRoom"/>
+        <result property="canInputWine" column="canInputWine"/>
+        <result property="canInputFood" column="canInputFood"/>
+        <result property="canInternalRun" column="canInternalRun"/>
+    </resultMap>
+    
+    <select id="getRole" resultMap="RoleMap">
+		SELECT n.* FROM role as n where n.belongBusid=#{busid}
+    </select>
+    <select id="getRoleId" resultType="Integer">
+	    select IFNULL(SUM(n.rolid),0)as rolid from role as n where n.belongBusid=#{busid} and n.canProxyBusiness=1
+    </select>
+    <select id="getcanInternalRun" resultType="Integer">
+	    select IFNULL(SUM(n.rolid),0)as rolid from role as n where n.belongBusid=#{busid} and n.canInternalRun=1
+    </select>
+    <select id="getRoleName" resultMap="RoleMap">
+		select n.* from role as n where n.rolid=#{rolid}
+    </select>
+    <select id="getRoleUid" resultMap="RoleMap">
+		select n.* from role as n left join user_info as u on n.rolid=u.belongRolid where u.uid=#{uid}
+    </select>
+    <select id="getUserRole" resultMap="RoleMap">
+		SELECT n.* FROM role as n where n.rolid=#{rolid}
+    </select>
+    <select id="getRoleInput" resultMap="RoleMap">
+		SELECT n.* FROM role as n where n.rolid=#{belongRolid}
+    </select>
+    <select id="getisCanBindRole" resultType="Integer">
+	    select IFNULL(SUM(n.rolid),0)as rolid from role as n where n.belongBusid=#{belongBusid} and n.canBeBindToRoom=1
+    </select>
+    <insert id="saveRole" parameterType="Role">
+        INSERT INTO role(roleName,belongBusid,belongDepid,canProxyBusiness,canIssueTask,canSeeSale,canSeeRoomIncome,canSeeAttendance,canToReward,canBindPrincess,canOpenRoom,canBindPrinToRoom,canBeBindToRoom,canInputWine,canInputFood,canInternalRun)
+        VALUES(#{roleName},#{belongBusid},#{belongDepid},#{canProxyBusiness},#{canIssueTask},#{canSeeSale},#{canSeeRoomIncome},#{canSeeAttendance},#{canToReward},#{canBindPrincess},#{canOpenRoom},#{canBindPrinToRoom},#{canBeBindToRoom},#{canInputWine},#{canInputFood},#{canInternalRun})
+    </insert>
+    <delete id="deleteRole" parameterType="int">
+    	delete from role where rolid=#{rolid}
+    </delete>
+    <update id="updateRole" parameterType="Role">
+		update role set roleName=#{roleName},belongBusid=#{belongBusid},belongDepid=#{belongDepid},canProxyBusiness=#{canProxyBusiness},canIssueTask=#{canIssueTask},
+		canSeeSale=#{canSeeSale},canSeeRoomIncome=#{canSeeRoomIncome},canSeeAttendance=#{canSeeAttendance},canToReward=#{canToReward},canBindPrincess=#{canBindPrincess},
+		canOpenRoom=#{canOpenRoom},canBindPrinToRoom=#{canBindPrinToRoom},canBeBindToRoom=#{canBeBindToRoom},canInputWine=#{canInputWine},canInputFood=#{canInputFood},canInternalRun=#{canInternalRun}  where rolid =#{rolid}
+    </update>
+</mapper>

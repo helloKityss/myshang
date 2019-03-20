@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.roomRecord.dao.RoomRecordDao">
+
+    <resultMap type="RoomRecord" id="RoomRecordMap">
+        <id property="openid" column="openid"/>
+        <result property="openRoomUid" column="openRoomUid"/>
+        <result property="opentime" column="opentime"/>
+    </resultMap>
+    <insert id="saveOpenRoom" parameterType="RoomRecord">
+        INSERT INTO user_info(openRoomUid,opentime)
+        VALUES(#{openRoomUid},#{opentime})
+    </insert>
+    <select id="queryRoomRecord" resultType="HashMap">
+		select n.*,u.userName,u.avatarUrl,count(n.openRoomUid)as count from room_record as n left join user_info u on n.openRoomUid=u.uid GROUP BY n.openRoomUid ORDER BY count desc
+    </select>
+</mapper>

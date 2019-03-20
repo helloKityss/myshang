@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.account.dao.AccountDao">
+
+    <resultMap type="Account" id="AccountMap">
+        <id property="accid" column="accid"/>
+        <result property="userId" column="userId"/>
+        <result property="accountBalance" column="accountBalance"/>
+    </resultMap>
+    
+    <insert id="addAccount" parameterType="Account">
+        INSERT INTO account(userId)
+        VALUES(#{userId})
+    </insert>
+    <select id="getAccount" resultType="java.math.BigDecimal">
+		SELECT n.accountBalance FROM account as n where n.userId=#{userId}
+    </select>
+    <select id="getAccountCount" parameterType="int" resultType="int">
+        SELECT COUNT(DISTINCT t.userId) FROM account t WHERE t.userId = #{userId}
+    </select>
+   	<update id="UpdateAccount">
+        UPDATE account t SET t.accountBalance = #{accountBalance} WHERE t.userId = #{userId}
+    </update>
+    <select id="getAccountByGeneralManager"  resultMap="AccountMap">
+    	select * from account where userId=(select user_info.uid from user_info where user_info.belongRolid= (select role.rolid from role where canProxyBusiness=1 and belongBusid=#{belongBusid}))
+    </select>
+</mapper>

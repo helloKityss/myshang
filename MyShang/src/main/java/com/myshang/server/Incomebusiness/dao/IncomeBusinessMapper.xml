@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.Incomebusiness.dao.IncomeBusinessDao">
+
+	<resultMap type="IncomeBusiness" id="IncomeBusinessMap">
+		<id property="incomeId" column="incomeId" />
+		<result property="busId" column="busId" />
+		<result property="type" column="type" />
+		<result property="incomeMoney" column="incomeMoney" />
+		<result property="createTime" column="createTime" />
+	</resultMap>
+   	<insert id="saveIncome" parameterType="IncomeBusiness">
+        INSERT INTO business_income(busId,type,incomeMoney,createTime)
+        VALUES(#{busId},#{type},#{incomeMoney},#{createTime})
+    </insert>
+    <select id="selectIncome" resultType="HashMap">
+		SELECT
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=1 or n.type=2 or n.type=3 or n.type=4)as SumMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=1)as cashMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=2)as PayCardMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=3)as ConsumptionMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=4)as AlipayMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=5)as CardRechargeMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=6)as ConsumptionMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=7)as AmountMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=8)as RepaymentMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=9)as OtherMoeny,
+			(select sum( n.incomeMoney ) AS moeny from business_income n where n.type=10)as EntertainMoeny
+		FROM
+			business_income n 
+		WHERE
+			n.busId = 1
+			AND DATE_FORMAT( n.createTime, '%Y%m%d%H%i%s' ) BETWEEN DATE_FORMAT( now( ), '%Y%m%d120000' ) - 1000000 
+			AND DATE_FORMAT( now( ), '%Y%m%d150000' ) 
+		GROUP BY
+			n.busId
+    </select>
+</mapper>

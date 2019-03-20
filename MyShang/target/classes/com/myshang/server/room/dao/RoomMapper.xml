@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.room.dao.RoomDao">
+
+    <resultMap type="Room" id="RoomMap">
+        <id property="rooid" column="rooid"/>
+        <result property="roomName" column="roomName"/>
+        <result property="roomType" column="roomType"/>
+        <result property="belongBusid" column="belongBusid"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+    
+    <select id="getRoomList" resultMap="RoomMap">
+		SELECT r.* from room r where r.belongBusid=#{belongBusid} order by roomName
+    </select>
+    <insert id="saveRoom" parameterType="Room" useGeneratedKeys="true" keyProperty="rooid">
+        INSERT INTO room(roomName,roomType,belongBusid,remark)
+        VALUES(#{roomName},#{roomType},#{belongBusid},#{remark})
+    </insert>
+    <delete id="deleteRoom" parameterType="int">
+    	delete from room where rooid=#{rooid}
+    </delete>
+    <update id="updateRoom" parameterType="Room">
+    	update room as n set n.roomName=#{roomName},n.roomType=#{roomType},n.remark=#{remark} where n.rooid=#{rooid}
+    </update>
+</mapper>

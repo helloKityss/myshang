@@ -1,0 +1,465 @@
+﻿@import "base.less";
+
+/*主页面*/
+.container {
+    background-image: url("../resource/image/bg.jpg");
+    background-size: 100% 100%;
+    overflow: auto;
+}
+
+/*.header-title {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    line-height: 72px;
+    font-size: 2.2rem;
+    text-align: center;
+    color: white;
+}*/
+
+.header {
+    position: relative;
+    width: 100%;
+    height: 144px;
+    overflow: hidden;
+}
+.header > .headimg {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+}
+.header > .name {
+    position: absolute;
+    left: 102px;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 30px;
+    font-size: 2.0rem;
+    color: #FFF;
+}
+.header > .number {
+    position: absolute;
+    top: 50%;
+    right: 28px;
+    transform: translateY(-50%);
+    line-height: 30px;
+    font-size: 1.6rem;
+    color: rgba(255,255,255,0.6);
+	&::before {
+		content: "工号：";
+	}
+}
+
+.content {
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+.content > .item {
+    position: relative;
+    width: 85%;
+    height: 64px;
+    margin: 0 auto 15px auto;
+    box-sizing: border-box;
+    border: 1px solid;
+    border-radius: 32px;
+    line-height: 24px;
+    font-size: 1.7rem;
+    text-align: center;
+    color: #FFF;
+}
+.content > .item.zero {
+    border: none;
+    line-height: 64px;
+    color: #373981;
+    background-color: #FFF;
+}
+.heart-group {
+    position: absolute;
+    width: 100%;
+    height: 14px;
+    top: 14px;
+    line-height: 0;
+}
+.heart-group > .heart {
+    display: inline-block;
+    position: relative;
+    width: auto;
+    height: 100%;
+    margin-right: 3px;
+    &:nth-last-child(1) {
+        margin-right: 0;
+    }
+}
+.item > .des {
+    position: absolute;
+    width: 100%;
+    height: 24px;
+    bottom: 8px;
+}
+.item .value {
+    color: #FF526D;
+}
+.item .value::before {
+    content: "红包";
+    color: #FFF;
+}
+.item .value::after {
+    content: " ";
+}
+.item.zero .value::before {
+    color: #373981;
+}
+.item.negative > .redbag {
+    display: block;
+    width: auto;
+    height: 22px;
+    margin: 10px auto 2px auto;
+}
+
+.footer {
+    position: relative;
+    width: 100%;
+    height: 124px;
+    margin-top: 50px;
+}
+.foot-one {
+    position: relative;
+    width: 85%;
+    height: 56px;
+    margin: 0 auto;
+    border-radius: 28px;
+    line-height: 56px;
+    font-size: 1.3rem;
+    text-align: center;
+    color: #FFF;
+    background-color: #1F2549;
+}
+
+.foot-two {
+    position: relative;
+    width: 100%;
+    margin-top: 38px;
+    line-height: 16px;
+    font-size: 1.1rem;
+    text-align: center;
+    color: rgba(255,255,255,0.6);
+}
+
+/*各个弹窗*/
+.pop-container {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    overflow: hidden;
+    background-color: rgba(55,57,129,0.95);
+}
+
+/*打赏金额*/
+.reward-amount {
+    display: none;
+    position: absolute;
+    width: 100% * 335 / 375;
+    height: auto;
+    left: 100% * 20 / 375;
+    top: 143px;
+    box-sizing: border-box;
+    border: 1px solid #979797;
+    border-radius: 10px;
+    background-color: white;
+    overflow: hidden;
+}
+.reward-amount > .headimg {
+    display: block;
+    width: 54px;
+    height: 54px;
+    margin: 27px auto 16px auto;
+    border-radius: 50%;
+}
+.reward-amount > .define {
+    display: block;
+    margin-bottom: 20px;
+    line-height: 28px;
+    font-size: 1.8rem;
+    text-align: center;
+    color: #FF526D;
+}
+.reward-amount > .range {
+    display: block;
+    margin-bottom: 5px;
+    line-height: 20px;
+    font-size: 1.3rem;
+    text-align: center;
+    color: #999;
+}
+.range > .lower::before {
+    content: "金额范围：";
+}
+.range > .upper::before {
+    content: "-";
+}
+.reward-amount > .amount {
+    display: block;
+    position: relative;
+    width: 100% * 250 / 335;
+    height: 44px;
+    margin: 0 auto 25px auto;
+    box-sizing: border-box;
+    border: 1px solid #D8D8D8;
+    border-radius: 6px;
+    overflow: hidden;
+    &::after {
+        content: "￥";
+        position: absolute;
+        left: 20px;
+        line-height: 42px;
+        font-size: 1.8rem;
+        color: #999;
+    }
+}
+.reward-amount > .amount > input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    font-size: 1.8rem;
+    text-align: center;
+    color: #333;
+}
+.reward-amount > .reward {
+    display: block;
+    width: 100% * 250 / 335;
+    margin: 0 auto 20px auto;
+    border-radius: 22px;
+    line-height: 44px;
+    font-size: 1.7rem;
+    text-align: center;
+    color: white;
+    background-color: #2CA6F0;
+}
+
+/*投诉内容*/
+.complain-content {
+    display: none;
+    position: absolute;
+    width: 100% * 335 / 375;
+    height: auto;
+    left: 100% * 20 / 375;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: white;
+    overflow: hidden;
+}
+.complain-content > .title {
+    display: block;
+    margin: 30px auto 20px auto;
+    line-height: 33px;
+    font-size: 2.4rem;
+    text-align: center;
+    color: #333;
+}
+.complain-content > .labels {
+    width: 100% * (335-28*2) / 335;
+    height: auto;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.labels > .label {
+    display: block;
+    float: left;
+    width: auto;
+    height: 30px;
+    margin: 0 12px 10px 0;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: 1px solid;
+    border-radius: 15px;
+    line-height: 28px;
+    font-size: 1.4rem;
+    color: #999;
+
+    &:nth-last-child(1) {
+        margin-right: 0;
+    }
+}
+.labels > .label.checked {
+    color: #2CA6F0;
+}
+.complain-content > textarea {
+    display: block;
+    width: 100% * 282 / 335;
+    height: 120px;
+    padding: 10px;
+    resize: none;
+    border: none;
+    margin: 0 auto 15px auto;
+    border-radius: 3px;
+    line-height: 23px;
+    font-size: 1.5rem;
+    color: #999;
+    background-color: #ECECEE;
+}
+.complain-content > .confirm {
+    display: block;
+    width: 100% * 250 / 335;
+    margin: 0 auto 15px auto;
+    border-radius: 22px;
+    line-height: 44px;
+    font-size: 1.7rem;
+    text-align: center;
+    color: white;
+    background-color: #2CA6F0;
+}
+
+/*投诉成功*/
+.complain-success {
+    display: none;
+    position: absolute;
+    width: 100% * 335 / 375;
+    height: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    background-color: white;
+    overflow: hidden;
+}
+.complain-success > .title {
+    display: block;
+    margin: 40px 0 24px 0;
+    line-height: 33px;
+    font-size: 2.4rem;
+    text-align: center;
+    color: #333333;
+}
+.complain-success > .text {
+    display: block;
+    width: 100% * 278 / 335;
+    height: auto;
+    margin: 0 auto 37px auto;
+    line-height: 23px;
+    font-size: 1.5rem;
+    color: #333333;
+}
+.complain-success > .confirm {
+    display: block;
+    width: 100% * 250 / 335;
+    margin: 0 auto 23px auto;
+    border-radius: 22px;
+    line-height: 44px;
+    font-size: 1.7rem;
+    text-align: center;
+    color: white;
+    background-color: #2CA6F0;
+}
+
+/*评价弹窗*/
+.reward-evaluate {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.evaluate.header {
+    height: 200px;
+}
+.evaluate > .close {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 25px;
+    right: 25px;
+}
+
+.evaluate-labels {
+    position: relative;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+.eval-label {
+    position: relative;
+    float: left;
+    width: 38.4%;
+    height: 44px;
+    margin: 0 0 15px 8.8%;
+    border: 1px solid;
+    border-radius: 22px;
+    line-height: 42px;
+    font-size: 1.7rem;
+    text-align: center;
+    color: white;
+}
+.eval-label:nth-child(2n) {
+    margin-left: 5.9%;
+}
+.eval-label.checked {
+    color: #3A3C83;
+    background-color: white;
+}
+
+.evaluate-confirm {
+    position: absolute;
+    width: 72.5%;
+    height: 48px;
+    left: 50%;
+    bottom: 75px;
+    transform: translateX(-50%);
+    border-radius: 24px;
+    line-height: 48px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: white;
+    background: -webkit-linear-gradient(right, #78EE85, #1297FF);
+}
+
+/*评价成功*/
+.evaluate-success {
+    display: none;
+    position: absolute;
+    width: 100% * 335 / 375;
+    height: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    background-color: white;
+    overflow: hidden;
+}
+.evaluate-success > .title {
+    display: block;
+    margin: 30px 0 30px 0;
+    line-height: 32px;
+    font-size: 2.4rem;
+    text-align: center;
+    color: #333333;
+}
+.evaluate-success > .buttons {
+    position: relative;
+    width: 100%;
+    height: 50px;
+}
+.buttons > span {
+    float: left;
+    width: 50%;
+    height: 100%;
+    line-height: 50px;
+    font-size: 1.7rem;
+    text-align: center;
+    color: white;
+}
+.buttons > span.close-page {
+    background-color: #999;
+}
+.buttons > span.continue {
+    background: #2CA6F0;
+}

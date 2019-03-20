@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.preciousSale.dao.PreciousSaleDao">
+
+    <resultMap type="PreciousSale" id="PreciousSaleMap">
+        <id property="salid" column="salid"/>
+        <result property="preciousId" column="preciousId"/>
+        <result property="preciousName" column="preciousName"/>
+        <result property="preciousPrice" column="preciousPrice"/>
+        <result property="saleCount" column="saleCount"/>
+        <result property="saleRoomId" column="saleRoomId"/>
+        <result property="saleTime" column="saleTime"/>
+        <result property="preciousImage" column="preciousImage"/>
+        <result property="totalMoney" column="totalMoney"/>
+        <result property="belongBusid" column="belongBusid"/>
+    </resultMap>
+    
+    <insert id="createPreciousSale" parameterType="PreciousSale">
+        INSERT INTO precious_sale(preciousId,preciousName,preciousPrice,saleCount,saleRoomId,saleTime,preciousImage,totalMoney,belongBusid)
+        VALUES(#{preciousId},#{preciousName},#{preciousPrice},#{saleCount},#{saleRoomId},#{saleTime},#{preciousImage},#{totalMoney},#{belongBusid})
+    </insert>
+    <select id="getPreciousSale" resultMap="PreciousSaleMap">
+   		SELECT n.*,r.roomName,date_format(n.saleTime,'%Y/%m/%d/%H:%i:%s')as formatTime  FROM precious_sale as n left JOIN room as r on r.rooid=n.saleRoomId WHERE DATE_SUB(CURDATE(), INTERVAL #{querytime} DAY) <![CDATA[<=date(n.saleTime)]]> and n.belongBusid=#{belongBusid}  ORDER BY n.saleTime desc
+    </select>
+    <select id="getPreciousDaySale" resultMap="PreciousSaleMap">
+   		SELECT n.*,r.roomName,date_format(n.saleTime,'%Y/%m/%d')as formatTime  FROM precious_sale as n left JOIN room as r on r.rooid=n.saleRoomId WHERE DATE_FORMAT(n.saleTime,'%Y%m%d') = DATE_FORMAT(now(),'%Y%m%d') and n.belongBusid=#{belongBusid} ORDER BY n.saleTime desc
+    </select>
+    <select id="getPreciousSaleMoney" resultMap="PreciousSaleMap">
+	 	SELECT
+			sum( n.preciousPrice * n.saleCount )as sumMoney
+		FROM
+			precious_sale n 
+		WHERE
+			 DATE_SUB(CURDATE(), INTERVAL 7 DAY) <![CDATA[<=date(n.saleTime)]]> 
+			 and belongBusid=#{belongBusid}
+		GROUP BY
+		n.salid
+    </select>
+    <select id="getYesterdayMoney" resultMap="PreciousSaleMap">
+	 	SELECT
+			sum( n.preciousPrice * n.saleCount )as sumMoney
+		FROM
+			precious_sale n 
+		WHERE DATE_FORMAT(n.saleTime,'%Y%m%d') = DATE_FORMAT(now(),'%Y%m%d')-1
+		and belongBusid=#{belongBusid}
+		GROUP BY
+		n.salid
+    </select>
+    <delete id="deletePreciousSale" parameterType="int">
+		delete from precious_sale where salid =#{salid}
+    </delete>
+    <select id="getRoomSale" resultType="java.math.BigDecimal">
+		select sum(n.totalMoney) from precious_sale n where n.saleRoomId=1 GROUP BY n.saleRoomId
+    </select>
+</mapper>

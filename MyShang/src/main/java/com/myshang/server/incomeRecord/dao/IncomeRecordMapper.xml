@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.incomeRecord.dao.IncomeRecordDao">
+
+	<resultMap type="IncomeRecord" id="IncomeRecordMap">
+		<id property="incid" column="incid" />
+		<result property="userId" column="userId" />
+		<result property="incomeMoney" column="incomeMoney" />
+		<result property="incomeTime" column="incomeTime" />
+		<result property="rewardId" column="rewardId" />
+	</resultMap>
+
+	<select id="getincomeRecord" resultMap="IncomeRecordMap">
+		SELECT
+			n.*,
+			date_format( n.incomeTime, '%Y.%m.%d' ) AS formatTime 
+		FROM
+			income_record AS n 
+		WHERE
+			n.userId = #{userId}
+			and date_format( n.incomeTime, '%Y-%m-%d' ) between #{startTime} and #{endTime}
+		GROUP BY
+			n.incid 
+		ORDER BY
+			n.incomeTime DESC
+	</select>
+	<select id="getMonthincomeRecord" resultMap="IncomeRecordMap">
+		SELECT
+			n.*,
+			date_format( n.incomeTime, '%Y.%m.%d' ) AS formatTime 
+		FROM
+			income_record AS n 
+		WHERE
+			n.userId = #{userId}
+			and date_format( n.incomeTime, '%Y-%m-%d' ) 
+			<if test="Month!=0"><![CDATA[> DATE_SUB(CURDATE(), INTERVAL #{Month} MONTH)]]></if>
+		GROUP BY
+			n.incid 
+		ORDER BY
+			n.incomeTime DESC
+	</select>
+	<select id="getRecordMoney" resultType="java.math.BigDecimal">
+		SELECT
+		sum(n.incomeMoney)
+		FROM
+		income_record AS n
+		WHERE
+		n.userId = #{userId} and
+		year(n.incomeTime)=year(now()) and
+		month(n.incomeTime)=month(now()) and
+		day(n.incomeTime)=day(now())
+		GROUP BY n.userId
+	</select>
+	<select id="getSumMoney" resultType="java.math.BigDecimal">
+		SELECT
+		sum(n.incomeMoney)
+		FROM
+		income_record AS n
+		WHERE
+		n.userId = #{userId}
+		and
+		DATE_SUB(CURDATE(), INTERVAL 7 DAY) <![CDATA[<=date(n.incomeTime)]]>
+	</select>
+	<insert id="addAnIncome" parameterType="IncomeRecord">
+		insert into income_record(userId,incomeMoney,rewardId,incomeTime)
+		values (#{userId},#{incomeMoney},#{rewardId},#{incomeTime})
+	</insert>
+	<insert id="addIncomeInfo" parameterType="java.util.List">
+		insert into income_record(userId,incomeMoney,incomeTime,rewardId)
+		values
+		<foreach collection="list" item="item" index="index" separator="," close=";">
+			(#{item.userId},#{item.incomeMoney},#{item.incomeTime},#{item.rewardId})
+		</foreach>
+	</insert>
+	<select id="getIncomes" resultType="HashMap">
+		SELECT
+		date_format( n.incomeTime, '%Y-%m-%d %H:%i' ) AS formatTime,
+			sum(n.incomeMoney)  as incomeMoney
+		FROM
+			income_record AS n 
+		WHERE
+		n.userId = #{userId} GROUP BY date_format( n.incomeTime, '%Y.%m.%d' ) ORDER BY n.incomeTime desc
+	</select>
+   	<select id="getSumIncomesMoney" resultType="java.math.BigDecimal">
+		SELECT
+			sum(n.incomeMoney)
+		FROM
+			income_record AS n 
+		WHERE
+			n.userId = #{userId} GROUP BY n.userId
+    </select>
+   	<select id="getPraise" resultType="HashMap">
+		SELECT
+			n.userName
+		FROM
+			income_record AS a
+			LEFT JOIN user_info AS n ON n.uid = a.userId 
+		WHERE
+			n.hasRegister = 1 and n.belongBusid=#{belongBusid}
+			and 		
+			year(a.incomeTime)=year(now()) and
+			month(a.incomeTime)=month(now()) and
+			day(a.incomeTime)=day(now())
+		GROUP BY
+			a.userId
+    </select>
+  	<select id="getPraiseCount" resultType="int">
+		SELECT
+			count(n.userName)
+		FROM
+			income_record AS a
+			LEFT JOIN user_info AS n ON n.uid = a.userId 
+		WHERE
+			n.hasRegister = 1 and n.belongBusid=#{belongBusid}
+			and 		
+			year(a.incomeTime)=year(now()) and
+			month(a.incomeTime)=month(now()) and
+			day(a.incomeTime)=day(now())
+    </select>
+   	<select id="getPraiseInformation" resultType="HashMap">
+		SELECT
+			n.userName,
+			n.avatarUrl,
+			a.incomeTime,
+			a.incomeMoney
+		FROM
+			income_record AS a
+			LEFT JOIN user_info AS n ON n.uid = a.userId 
+		WHERE
+			n.hasRegister = 1 and n.belongBusid=#{belongBusid}
+			and 		
+			year(a.incomeTime)=year(now()) and
+			month(a.incomeTime)=month(now()) and
+			day(a.incomeTime)=day(now())
+		ORDER BY
+			a.incomeMoney desc
+    </select>
+   	<select id="getSumInformation" resultType="HashMap">
+		SELECT
+			n.userName,
+			n.avatarUrl,
+			count(a.userId)as sumcount,
+			sum( a.incomeMoney ) AS summoney
+		FROM
+			income_record AS a
+			LEFT JOIN user_info AS n ON n.uid = a.userId 
+		WHERE
+			n.hasRegister = 1 and n.belongBusid=1
+			and
+		DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[<=date(a.incomeTime)]]>
+		GROUP BY
+			a.userId
+		ORDER BY
+			summoney desc
+			LIMIT 0, 10
+    </select>
+</mapper>

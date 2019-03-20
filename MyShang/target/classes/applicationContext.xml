@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx" 
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+                        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd  
+                        http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                        http://www.springframework.org/schema/aop 
+                        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                        http://www.springframework.org/schema/tx 
+                        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <bean id="propertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:redis.properties</value>
+                <value>classpath:jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+    
+    <context:component-scan base-package="com.myshang.server" />
+
+    <aop:aspectj-autoproxy proxy-target-class="false" />
+    
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+        init-method="init" destroy-method="close"
+        p:driverClassName="${jdbc.driver}"
+        p:url="jdbc:mysql://${jdbc.host}:${jdbc.port}/${jdbc.database}?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull"
+        p:username="${jdbc.username}" 
+        p:password="${jdbc.password}" 
+        p:maxActive="${jdbc.maxActive}" 
+        p:initialSize="${jdbc.initialSize}" 
+        p:maxWait="${jdbc.maxWait}" 
+        p:minIdle="${jdbc.minIdle}" 
+        p:removeAbandoned="true" 
+        p:removeAbandonedTimeout="${jdbc.timeout}" 
+        p:connectionProperties="clientEncoding=UTF-8" />
+        
+    <!-- mybatis文件配置，扫描所有mapper文件 -->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+        p:dataSource-ref="dataSource" 
+        p:configLocation="classpath:mybatis-config.xml"
+        p:mapperLocations="classpath:com/myshang/server/**/*Mapper.xml" />
+
+    <!-- spring与mybatis整合配置，扫描所有dao -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+        p:basePackage="com.myshang.server.**.dao" 
+        p:sqlSessionFactoryBeanName="sessionFactory" />
+
+    <!-- 对数据源进行事务管理 -->
+    <bean id="transactionManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+        p:dataSource-ref="dataSource" />
+        
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="jedisConnFactory"
+        class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" 
+        p:poolConfig-ref="jedisPoolConfig"
+        p:usePool="true" 
+        p:hostName="${redis.host}" 
+        p:port="${redis.port}" 
+        p:password="${redis.password}" 
+        p:timeout="${redis.timeout}" 
+        p:database="${redis.database}" />
+    
+    <bean name="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig"
+        p:maxIdle="${redis.maxIdle}" />
+
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" lazy-init="false">
+        <property name="connectionFactory"   ref="jedisConnFactory" />
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+        </property>
+        <property name="hashKeySerializer">
+           <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="hashValueSerializer">
+           <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </property>
+     </bean>
+     
+     <!--声明redis消息侦听器容器 -->
+<!--     <bean id="messageListener" class="org.springframework.data.redis.listener.adapter.MessageListenerAdapter">
+        <constructor-arg>
+            <bean class="com.myshang.server.redis.impl.RedisMessageDelegataImpl"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="redisContainer" class="org.springframework.data.redis.listener.RedisMessageListenerContainer">
+        <property name="connectionFactory" ref="jedisConnFactory"/>
+        <property name="messageListeners">
+            <map>
+                <entry key-ref="messageListener">
+                    <bean class="org.springframework.data.redis.listener.ChannelTopic">
+                        <constructor-arg value="__keyevent@0__:expired"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean> -->
+    
+    <!-- <bean id="prizeHandlerThread" class="com.onedollar.server.house.thread.PrizeHandlerThread" scope="prototype" />
+        <bean id="pokerHandlerThread" class="com.onedollar.server.poker.thread.PokerHandlerThread" scope="prototype" /> -->
+
+</beans>

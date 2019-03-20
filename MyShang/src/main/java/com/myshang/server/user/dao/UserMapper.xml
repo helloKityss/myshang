@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.user.dao.UserDao">
+
+    <resultMap type="User" id="userMap">
+        <id property="uid" column="uid"/>
+        <result property="userName" column="userName"/>
+        <result property="phoneNumber" column="phoneNumber"/>
+        <result property="belongBusid" column="belongBusid"/>
+        <result property="belongDepid" column="belongDepid"/>
+        <result property="belongRolid" column="belongRolid"/>
+        <result property="openId" column="openId"/>
+        <result property="unionId" column="unionId"/>
+        <result property="gender" column="gender"/>
+        <result property="avatarUrl" column="avatarUrl"/>
+        <result property="province" column="province"/>
+        <result property="country" column="country"/>
+        <result property="createTime" column="createTime"/>
+        <result property="passWord" column="passWord"/>
+        <result property="hasRegister" column="hasRegister"/>
+        <result property="isOnline" column="isOnline"/>
+        <result property="birthday" column="birthday"/>
+        <result property="height" column="height"/>
+        <result property="registrationCode" column="registrationCode"/>
+        <result property="speciality" column="speciality"/>
+    </resultMap>
+    <insert id="register" parameterType="User" useGeneratedKeys="true" keyProperty="uid">
+        INSERT INTO user_info(phoneNumber,createTime,passWord,registrationCode,userName,belongBusid,belongDepid,belongRolid,gender,avatarUrl,province,country,hasRegister,isOnline,birthday,height,speciality)
+        VALUES(#{phoneNumber},#{createTime},#{passWord},#{registrationCode},#{userName},#{belongBusid},#{belongDepid},#{belongRolid},#{gender},#{avatarUrl},#{province},#{country},#{hasRegister},#{isOnline},#{birthday},#{height},#{speciality})
+    </insert>
+    <select id="getUserOpenId" resultMap="userMap">
+		select n.uid,n.belongBusid,n.belongRolid,n.hasRegister from user_info as n where unionId=#{unionId}
+    </select>
+    <select id="getByWaiterRoom" resultType="HashMap">
+		select n.uid,n.userName,n.avatarUrl from user_info as n where uid=#{uid}
+    </select>
+    <select id="queryRolid" resultMap="userMap">
+		select n.* from user_info as n where uid=#{uid}
+    </select>
+    <select id="queryBusid" resultMap="userMap">
+		select n.belongBusid from user_info as n where uid=#{uid}
+    </select>
+    <select id="getWaiterBind" resultType="Integer">
+		select IFNULL(SUM(r.canBindPrinToRoom),0)as canBindPrinToRoom from user_info as n left join role as r on n.belongRolid=r.rolid where n.uid=#{uid}
+    </select>
+    <select id="queryDepid" resultType="Integer">
+		select IFNULL(SUM(n.belongDepid),0)as belongDepid from user_info as n where n.uid=#{uid}
+    </select>
+    <select id="getmanagerid" resultMap="userMap">
+		select n.* from user_info as n where n.belongRolid=#{belongRolid} and n.belongBusid=#{belongBusid} and n.hasRegister=1
+    </select>
+    <select id="getdepartCount" resultType="int">
+        SELECT COUNT(*) FROM user_info t WHERE t.belongDepid = #{belongDepid} and t.hasRegister=1 and t.isOnline=1
+    </select>
+    <select id="getstaffCount" resultType="int">
+        SELECT COUNT(*) FROM user_info t WHERE t.belongBusid = #{belongBusid} and t.hasRegister=1 and t.isOnline=1 <if test="belongDepid!=0">AND t.belongDepid=#{belongDepid}</if>
+    </select>
+    <select id="findUserByUuid" resultMap="userMap">
+		select n.* from user_info as n where n.uid=#{issueUserId}
+    </select>
+    <select id="getUserinformation" resultType="HashMap">
+		SELECT n.userName,n.gender,n.avatarUrl,r.roleName,b.businessName,b.businessLogo,d.departName FROM user_info as n left JOIN role as r on rolid=n.belongRolid left join business as b on b.busid=n.belongBusid left join department as d on d.depid=n.belongDepid where n.uid=#{issueUserId}
+    </select>
+    <select id="getAllisCanBind" resultMap="userMap">
+		SELECT
+			n.* 
+		FROM
+			user_info AS n
+		WHERE
+			n.belongBusid = #{belongBusid}
+			and n.belongRolid= #{belongRolid}
+    </select>
+    <select id="getuserId" resultType="Integer">
+	    select IFNULL(SUM(n.uid),0)as uid from user_info as n where n.belongRolid=#{belongRolid}
+    </select>
+    <select id="getUserinfoByViceprincess" resultMap="userMap">
+	    select * from  user_info as u inner join vice_princess_bind as v on u.uid=v.bindPrincessId  where v.viceManagerId=#{viceManagerId} and u.belongBusid=#{belongBusid} 
+	</select>
+   	<select id="getstaffAll" resultMap="userMap">
+	    SELECT
+			u.*,
+			r.roleName AS roleName,
+			d.departName as departName
+		FROM
+			user_info AS u
+			LEFT JOIN role AS r ON u.belongRolid = r.rolid
+			left join department as d on u.belongDepid=d.depid
+		where u.belongBusid=#{belongBusid} and u.hasRegister=1 and u.isOnline=1
+	</select>
+    <update id="updateUserinformation" parameterType="User">
+		update user_info set belongDepid=#{belongDepid},belongRolid=#{belongRolid} where uid =#{uid}
+    </update>
+    <update id="deleteUser">
+		update user_info set hasRegister=0 where uid =#{uid}
+    </update>
+    <select id="getIsCanBind" resultType="Integer">
+	    SELECT
+			IFNULL( SUM( r.canBindPrincess ), 0 ) AS canBindPrincess 
+		FROM
+		user_info AS n
+			LEFT JOIN role AS r ON n.belongRolid = r.rolid 
+		WHERE
+			n.uid = #{uid}
+    </select>
+    <select id="getIsManager" resultType="com.myshang.server.role.model.Role">
+	    SELECT
+			r.canBindPrincess,r.canProxyBusiness,r.canBindPrinToRoom,r.roleName
+		FROM
+		user_info AS n
+			LEFT JOIN role AS r ON n.belongRolid = r.rolid 
+		WHERE
+			n.uid = #{uid}
+    </select>
+    <update id="userByBusid" parameterType="User">
+		update user_info set belongBusid=#{belongBusid},belongDepid=#{belongDepid},belongRolid=#{belongRolid} where uid =#{uid}
+    </update>
+    <select id="getcanInternalRun" resultType="integer">
+		select IFNULL(SUM(u.uid),0)as uid from user_info as u left join role as r on r.rolid=u.belongRolid where u.belongBusid=#{belongBusid} and r.canInternalRun=1
+    </select>
+    <select id="getuseropen" resultMap="userMap">
+		SELECT n.* FROM user_info as n where n.uid=#{uid}
+    </select>
+    <update id="updateuserName" parameterType="User">
+		update user_info set userName=#{userName} where uid =#{uid}
+    </update>
+    <update id="updateuserisOnline" parameterType="int">
+		update user_info set isOnline=0  where uid =#{uid}
+    </update>
+    <select id="getuserisOnline" resultType="HashMap">
+		SELECT n.* FROM user_info as n where n.belongBusid=#{belongBusid} <if test="belongDepid!=0">AND n.belongDepid=#{belongDepid}</if> and n.isOnline=0
+    </select>
+    <select id="getuseList" resultMap="userMap">
+		SELECT n.*,d.departName FROM user_info as n LEFT JOIN department d ON d.depid = n.belongDepid where n.belongBusid=#{belongBusid} <if test="belongDepid!=0"> AND n.belongDepid=#{belongDepid}</if> and n.hasRegister=1 and n.isOnline=1
+    </select>
+
+    <select id="findUserByPhone" parameterType="string" resultType="User">
+        SELECT t.* FROM user_info t WHERE t.phoneNumber = #{phoneNumber}
+    </select>
+    <update id="perfect" parameterType="int">
+		update user_info set userName=#{userName},gender=#{gender},avatarUrl=#{avatarUrl},birthday=#{birthday},province=#{province},country=#{country},height=#{height} where uid =#{uid}
+    </update>
+    <update id="complete" parameterType="int">
+		update user_info set belongBusid=#{belongBusid},belongDepid=#{belongDepid},belongRolid=#{belongRolid} where uid =#{uid}
+    </update>
+    <select id="checkPassword" resultType="int">
+        SELECT COUNT(*) FROM user_info t WHERE t.phoneNumber = #{phoneNumber} AND t.passWord = #{passWord}
+    </select>
+    <update id="updatePassword" parameterType="User">
+		update user_info set passWord=#{passWord} where phoneNumber =#{phoneNumber}
+    </update>
+    <update id="saveOpenId" parameterType="User">
+		update user_info set openId=#{openId},unionId=#{unionId} where uid =#{uid}
+    </update>
+</mapper>

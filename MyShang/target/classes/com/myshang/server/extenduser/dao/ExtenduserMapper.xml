@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.extenduser.dao.ExtenduserDao">
+
+	<resultMap type="Extenduser" id="ExtenduserMap">
+		<id property="extid" column="extid" />
+		<result property="userName" column="userName" />
+		<result property="nickName" column="nickName" />
+		<result property="phoneNumber" column="phoneNumber" />
+		<result property="hasRegister" column="hasRegister" />
+		<result property="openId" column="openId" />
+		<result property="unionId" column="unionId" />
+		<result property="gender" column="gender" />
+		<result property="avatarUrl" column="avatarUrl" />
+		<result property="city" column="city" />
+		<result property="province" column="province" />
+		<result property="country" column="country" />
+		<result property="createTime" column="createTime" />
+		<result property="extendZone" column="extendZone" />
+	</resultMap>
+    <insert id="save" parameterType="Extenduser">
+        INSERT INTO extend_user(userName,nickName,phoneNumber,hasRegister,openId,unionId,gender,avatarUrl,city,province,country,createTime,extendZone)
+        VALUES(#{userName},#{nickName},#{phoneNumber},#{hasRegister},#{openId},#{unionId},#{gender},#{avatarUrl},#{city},#{province},#{country},#{createTime},#{extendZone})
+    </insert>
+    <select id="getExtendlisMaps" resultMap="ExtenduserMap">
+		select * from extend_user where openid=#{openid}
+    </select>
+    <insert id="saveExtenduser" parameterType="User" useGeneratedKeys="true" keyProperty="extid">
+        INSERT INTO extend_user(openId,createTime)
+        VALUES(#{openId},#{createTime})
+    </insert>
+    <update id="updateExtenduserByWeiXin" parameterType="Extenduser">
+		update extend_user set nickName= #{nickName},city=#{city},province=#{province},unionId=#{unionId},country=#{country},avatarUrl=#{avatarUrl},gender=#{gender} where extid =#{extid}
+    </update>
+    <update id="updateExtendMobileByWeiXin" parameterType="Extenduser">
+		update extend_user set phoneNumber=#{phoneNumber} where extid =#{extid}
+    </update>
+    <update id="createUser" parameterType="Extenduser">
+		update user_info set userName=#{userName},hasRegister=#{hasRegister} where uid =#{uid}
+    </update>
+</mapper>

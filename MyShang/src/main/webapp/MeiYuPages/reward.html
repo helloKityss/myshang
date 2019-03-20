@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title>微笑服务评价</title>
+    <link rel="stylesheet" type="text/css" href="./css/reward.css" />
+</head>
+<body>
+    <div class="container">
+        <!--<div class="header-title">微笑服务评价</div>-->
+        <div class="header">
+            <img class="headimg" src="" />
+            <span class="name"></span>
+            <span class="number"></span>
+        </div>
+        <div class="content"></div>
+        <div class="footer">
+            <div class="foot-one">服务态度不好 投诉</div>
+            <div class="foot-two">北京美娱科技提供技术支持</div>
+        </div>
+    </div>
+    <div class="pop-container">
+        <div class="reward-amount">
+            <img class="headimg" src="" />
+            <span class="define">亲爱的，么么哒！</span>
+            <span class="range"><span class="lower"></span><span class="upper"></span></span>
+            <span class="amount"><input id="input" type="number" placeholder="请输入打赏金额" /></span>
+            <span class="reward">打赏</span>
+        </div>
+        <div class="reward-evaluate">
+            <div class="evaluate header">
+                <img class="headimg" src="" />
+                <span class="name"></span>
+                <span class="number"></span>
+                <img class="close" src="./resource/icon/close.png" />
+            </div>
+            <div class="evaluate-labels"></div>
+            <div class="evaluate-confirm">确定</div>
+        </div>
+        <div class="evaluate-success">
+            <span class="title">评价成功</span>
+            <div class="buttons">
+                <span class="close-page">关闭页面</span>
+                <span class="continue">继续评价</span>
+            </div>
+        </div>
+        <div class="complain-content">
+            <span class="title">投诉内容</span>
+            <div class="labels"></div>
+            <textarea id="textarea" placeholder="输入您要投诉的内容...(可选)"></textarea>
+            <span class="confirm">确定</span>
+        </div>
+        <div class="complain-success">
+            <span class="title">投诉成功</span>
+            <span class="text">已收到您对该员工的投诉信息，我们会持续改进服务，非常感谢！</span>
+            <span class="confirm">确定</span>
+        </div>
+    </div>
+    <script type="text/javascript" src="./js/common/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="./js/reward.js"></script>
+</body>
+</html>

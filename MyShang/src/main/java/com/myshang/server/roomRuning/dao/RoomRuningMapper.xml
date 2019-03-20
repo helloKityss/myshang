@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.roomRuning.dao.RoomRuningDao">
+	<resultMap type="RoomRuning" id="roomRuningMap">
+		<id property="runid" column="runid" />
+		<result property="roomId" column="roomId" />
+		<result property="belongBusid" column="belongBusid" />
+		<result property="roomState" column="roomState" />
+		<result property="openRoomUid" column="openRoomUid" />
+		<result property="bindPrincesses" column="bindPrincesses" />
+		<result property="bindWaiter" column="bindWaiter" />
+	</resultMap>
+	
+	<select id="getRoomRuningListByOpenUid" resultMap="roomRuningMap">
+	   select r.*,n.roomName from room_running as r left join room as n on r.roomId=n.rooid where r.openRoomUid=#{openRoomUid} ORDER BY n.roomName
+	</select >
+
+	<update id="updateRoomRuningPrincess" parameterType="RoomRuning">
+	   update room_running set bindPrincesses=#{bindPrincesses} where runid=#{runid}
+	</update>
+	
+	<select id="getRoom" resultMap="roomRuningMap">
+	    select r.*,n.roomName from room_running as r left join room as n on r.roomId=n.rooid where r.roomState!=0 and r.belongBusid=#{belongBusid} ORDER BY n.roomName
+	</select >
+	<select id="getAllRoom" resultMap="roomRuningMap">
+	   select r.*,n.roomName from room_running as r left join room as n on r.roomId=n.rooid where r.belongBusid=#{belongBusid} ORDER BY n.roomName
+	</select >
+   	<select id="getRoomincome" resultMap="roomRuningMap">
+		SELECT
+			r.*,t.roomName,
+			sum( n.money ) as sumMoney,
+			DATE_FORMAT( n.rewardTime, '%Y.%m.%d' ) AS days 
+		FROM
+			room_running r
+			left join reward_record n on r.roomId = n.roomId 
+			left join room as t on r.roomId=t.rooid
+		WHERE
+			r.roomId = #{roomId}
+			 and DATE_SUB(CURDATE(), INTERVAL #{querytime} DAY) <![CDATA[<=date(n.rewardTime)]]>
+		GROUP BY
+			r.runid,
+			days
+    </select>
+  	<select id="getSumRoom" resultMap="roomRuningMap">
+		select r.*,n.roomName,n.remark from room_running as r left join room as n on r.roomId=n.rooid where r.belongBusid=#{belongBusid} ORDER BY n.roomName
+    </select>
+   	<update id="updateRoomState">
+        UPDATE room_running t SET t.roomState = #{roomState},t.openRoomUid = #{openRoomUid},t.bindPrincesses=null WHERE t.roomId = #{roomId}
+    </update>
+    <select id="getRewardWaiter" resultMap="roomRuningMap">
+		select r.roomId from room_running r where r.openRoomUid=#{openRoomUid}
+    </select>
+    <select id="getRewardPrincess" resultMap="roomRuningMap">
+		select r.runid, r.roomId,r.openRoomUid,r.bindPrincesses from room_running r where r.bindPrincesses like '%,${_parameter},%'
+    </select>
+    <select id="getfreeRoom" resultType="HashMap">
+		SELECT
+			r.*,
+			n.roomName,
+			n.roomType,
+			n.remark
+		FROM
+			room_running AS r
+			LEFT JOIN room AS n ON r.roomId = n.rooid 
+		WHERE
+			r.belongBusid = #{belongBusid} ORDER BY n.roomName
+    </select>
+    <select id="queryRoomWaiter" resultType="HashMap">
+	    select n.roomName from room_running as r left join room as n on r.roomId=n.rooid where r.openRoomUid=#{openRoomUid} ORDER BY n.roomName
+    </select>
+    <select id="getRooming" resultMap="roomRuningMap">
+   	    select max(r.runid)as runid from room_running as r where r.openRoomUid=#{openRoomUid}
+    </select>
+    <insert id="saveRoomRuning" parameterType="RoomRuning">
+        INSERT INTO room_running(roomId,belongBusid)
+        VALUES(#{roomId},#{belongBusid})
+    </insert>
+    <select id="queryRoom" resultType="Integer">
+   	   	select count(n.runid) from room_running n
+    </select>
+    <select id="queryMakeRoom" resultType="Integer">
+   	   select count(n.runid) from room_running n where n.roomState != 0
+    </select>
+    <select id="consumption" resultType="HashMap">
+		SELECT
+			r.*,n.roomType
+		FROM
+			room_running r
+			left join room n
+			on r.roomId=n.rooid
+		WHERE r.roomState=3
+		GROUP BY r.roomId
+    </select>
+    <select id="getconsumptionById" resultType="HashMap">
+		SELECT
+			r.*,
+			(IFNULL( sum( t.totalMoney ), 0 ))as money
+		FROM
+			room r
+			LEFT JOIN precious_sale t ON r.rooid = t.saleRoomId 
+		WHERE t.saleRoomId=#{roomId}
+		GROUP BY t.saleRoomId
+		ORDER BY money desc
+    </select>
+   	<update id="updateCstate">
+        UPDATE room_running t SET t.roomState = 3 WHERE t.roomId = #{roomId}
+    </update>
+</mapper>

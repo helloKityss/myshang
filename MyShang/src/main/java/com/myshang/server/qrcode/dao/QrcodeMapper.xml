@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.myshang.server.qrcode.dao.QrcodeDao">
+    <resultMap type="Qrcode" id="qrcodeMap">
+        <id property="qrcid" column="qrcid"/>
+        <result property="qrcodeUrl" column="qrcodeUrl"/>
+        <result property="qrcodeImg" column="qrcodeImg"/>
+        <result property="hasBind" column="hasBind"/>
+        <result property="bindUserId" column="bindUserId"/>
+        <result property="belongBusid" column="belongBusid"/>
+        <result property="bindTime" column="bindTime"/>      
+    </resultMap>
+       
+    <select id="getQrcodeById" resultMap="qrcodeMap">
+        select * from reward_qrcode where qrcid=#{qrcid}
+    </select>
+       
+    <select id="getQrcodeByUid" resultMap="qrcodeMap">
+        select * from reward_qrcode where bindUserId=#{bindUserId}
+    </select>
+     
+	<update id="updateQrcodeStatusById" parameterType="Qrcode">
+	   update reward_qrcode set  
+	   hasBind=#{hasBind},
+	   bindUserId=#{bindUserId},
+	   belongBusid=#{belongBusid},
+	   bindTime=#{bindTime}
+	   where 
+	   qrcid=#{qrcid}
+	</update>
+    <select id="getqrcode" resultMap="qrcodeMap">
+       select n.* from reward_qrcode n where n.bindUserId=#{bindUserId}
+    </select>
+    <select id="getqrcodeAll" resultMap="qrcodeMap">
+		SELECT
+			n.*,
+			u.userName as userName,
+			r.roleName as roleName,
+			d.departName as departName
+		FROM
+			reward_qrcode AS n
+			LEFT JOIN user_info AS u ON n.bindUserId = u.uid
+			LEFT JOIN department AS d ON d.depid = u.belongDepid
+			LEFT JOIN role as r on r.rolid=u.belongRolid 
+			where n.belongBusid=#{belongBusid} and n.hasBind=1
+    </select>
+    <insert id="saveQRcode" parameterType="Qrcode">
+        INSERT INTO reward_qrcode(qrcodeUrl,qrcodeImg,hasBind,
+        bindUserId,belongBusid)
+        VALUES(#{qrcodeUrl},#{qrcodeImg},#{hasBind},#{bindUserId},#{belongBusid})
+    </insert>
+    <select id="getqrcodeId" resultType="Integer">
+       select IFNULL(MAX(n.qrcid),0)as belongDepid from reward_qrcode n
+    </select>
+    <update id="deleteqrcode" parameterType="int">
+		update reward_qrcode set hasBind=0,bindUserId=0,belongBusid=0 where bindUserId =#{bindUserId}
+    </update>
+</mapper>
+    

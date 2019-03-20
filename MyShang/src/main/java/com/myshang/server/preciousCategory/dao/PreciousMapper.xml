@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.preciousCategory.dao.PreciousDao">
+
+    <resultMap type="Precious" id="PreciousMap">
+        <id property="preid" column="preid"/>
+        <result property="preciousType" column="preciousType"/>
+        <result property="preciousName" column="preciousName"/>
+        <result property="preciousPrice" column="preciousPrice"/>
+        <result property="preciousImage" column="preciousImage"/>
+        <result property="belongBusid" column="belongBusid"/>
+    </resultMap>
+    <select id="getPreciousAlcohol" resultMap="PreciousMap">
+   		SELECT n.* FROM precious_category as n WHERE n.preciousType=1 and belongBusid=#{belongBusid} ORDER BY n.preid
+    </select>
+    <select id="getPreciousFood" resultMap="PreciousMap">
+   		SELECT n.* FROM precious_category as n WHERE n.preciousType=2 and belongBusid=#{belongBusid} ORDER BY n.preid
+    </select>
+    <select id="getPreciousinformation" resultMap="PreciousMap">
+   		SELECT n.* FROM precious_category as n WHERE preid=#{preid} and belongBusid=#{belongBusid} ORDER BY n.preid
+    </select>
+</mapper>

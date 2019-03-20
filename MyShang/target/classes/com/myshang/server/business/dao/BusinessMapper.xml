@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.business.dao.BusinessDao">
+
+    <resultMap type="Business" id="BusinessMap">
+        <id property="busid" column="busid"/>
+        <result property="businessName" column="businessName"/>
+        <result property="businessType" column="businessType"/>
+        <result property="address" column="address"/>
+        <result property="businessBoss" column="businessBoss"/>
+        <result property="businessPhone" column="businessPhone"/>
+        <result property="createTime" column="createTime"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="qrcodeUrl" column="qrcodeUrl"/>
+        <result property="businessLogo" column="businessLogo"/>
+        <result property="extendUserId" column="extendUserId"/>
+    </resultMap>
+    <select id="getbusiness" resultType="HashMap">
+		SELECT n.busid,n.businessName FROM business as n where n.busid != 0
+    </select>
+    <select id="getbusinessByName" resultType="String">
+		SELECT n.businessName FROM business as n where n.busid=#{busid}
+    </select>
+     <select id="getbusinessByUrl" resultType="String">
+		SELECT n.qrcodeUrl FROM business as n where n.busid=#{busid}
+    </select>
+    <select id="getLatitudeAndLongitude" resultType="HashMap">
+		SELECT n.latitude,n.longitude FROM business as n where n.busid=#{busid}
+    </select>
+    <update id="updateBusiness" parameterType="Business">
+		update business set qrcodeUrl=#{qrcodeUrl} where busid =#{busid}
+    </update>
+    <select id="getExtendId" resultType="Integer">
+		SELECT IFNULL(SUM(n.extendUserId),0)as extendUserId FROM business as n where n.busid=#{busid}
+    </select>
+    <insert id="savebussiness" parameterType="Business" useGeneratedKeys="true" keyProperty="busid">
+     	insert into business(businessName,businessType,address,latitude,longitude,qrcodeUrl,businessPhone,businessBoss,extendUserId,businessLogo)
+     	values(#{businessName},#{businessType},#{address},#{latitude},#{longitude},#{qrcodeUrl},#{businessPhone},#{businessBoss},#{extendUserId},#{businessLogo})    
+    </insert>
+    <select id="getbussiness" resultType="HashMap">
+		SELECT
+			n.businessName,
+			n.busId,
+			n.extendUserId,
+			a.password,
+			a.loginName,
+			n.businessPhone,
+			u.userName,
+			n.longitude,
+			n.latitude,
+			n.businessType,
+			n.businessLogo,
+			n.businessBoss,
+			n.address 
+		FROM
+		business AS n
+		LEFT JOIN login AS a ON n.busid = a.belongBusid
+		LEFT JOIN user_info AS u ON u.uid = n.extendUserId
+		where n.busid!=0
+    </select>
+    <update id="updatebussiness" parameterType="Business">
+		update business set businessName=#{businessName},businessType=#{businessType},address=#{address},latitude=#{latitude},longitude=#{longitude},businessPhone=#{businessPhone},businessBoss=#{businessBoss},businessLogo=#{businessLogo},extendUserId=#{extendUserId} where busid =#{busid}
+    </update>
+    <delete id="deletebussiness" parameterType="int">
+		delete from business where busid =#{busid}
+    </delete>
+    <update id="updatebussinessLogo">
+		update business set businessLogo=#{businessLogo} where busid =#{busid}
+    </update>
+</mapper>

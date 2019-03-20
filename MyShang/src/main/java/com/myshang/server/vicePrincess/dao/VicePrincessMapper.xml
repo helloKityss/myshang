@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.vicePrincess.dao.VicePrincessDao">
+	<resultMap type="VicePrincess" id="vicePrincessMap">
+		<id property="binid" column="binid" />
+		<result property="viceManagerId" column="viceManagerId" />
+		<result property="bindPrincessId" column="bindPrincessId" />
+		<result property="bindTime" column="bindTime" />
+	</resultMap>
+
+	<insert id="addVicePrincess" parameterType="VicePrincess">
+		insert into vice_princess_bind(viceManagerId,bindPrincessId,bindTime)
+		values(#{viceManagerId},#{bindPrincessId},#{bindTime})
+	</insert>
+	<insert id="createviceprin" parameterType="VicePrincess">
+		insert into vice_princess_bind(viceManagerId,bindPrincessId,bindTime)
+		values(#{viceManagerId},#{bindPrincessId},#{bindTime})
+	</insert>
+	
+	<select id="getVPByVidAndPid" parameterType="VicePrincess"  resultMap="vicePrincessMap">
+	    select * from vice_princess_bind where viceManagerId=#{viceManagerId} and bindPrincessId=#{bindPrincessId}	
+	</select>
+	<select id="getVicePrincess" resultType="integer">
+		select IFNULL(SUM(viceManagerId),0)as viceManagerId from vice_princess_bind where bindPrincessId = #{bindPrincessId}
+	</select>
+   	<delete id="deleteVicePrincess" parameterType="int">
+		delete from vice_princess_bind where bindPrincessId =#{bindPrincessId}
+    </delete>
+  	<select id="getviceprin" resultType="HashMap">
+		SELECT
+			n.*,
+			u.userName,
+			m.userName as princessName
+		FROM
+			vice_princess_bind AS n
+			LEFT JOIN user_info AS u ON u.uid = n.viceManagerId 
+			LEFT JOIN user_info AS m ON m.uid = n.bindPrincessId
+		WHERE
+			u.belongBusid =#{belongBusid}
+	</select>
+   	<delete id="deleteviceprin" parameterType="int">
+		delete from vice_princess_bind where binid =#{binid}
+    </delete>
+   	<delete id="deleteviceprinUser" parameterType="int">
+		delete from vice_princess_bind where viceManagerId =#{viceManagerId} or bindPrincessId=#{viceManagerId}
+    </delete>
+</mapper>
+
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.bankcard.dao.BankcardDao">
+
+    <resultMap type="Bankcard" id="BankcardMap">
+        <id property="banid" column="banid"/>
+        <result property="userId" column="userId"/>
+        <result property="userName" column="userName"/>
+        <result property="cardNumber" column="cardNumber"/>
+       	<result property="bankName" column="bankName"/>
+      	<result property="bankCode" column="bankCode"/>       
+    </resultMap>
+   	<insert id="addBankcard" parameterType="Bankcard">
+        INSERT INTO bankcard(userId,userName,cardNumber,bankName,bankCode)
+        VALUES(#{userId},#{userName},#{cardNumber},#{bankName},#{bankCode})
+    </insert>
+   	<select id="getBankcard" resultMap="BankcardMap">
+		SELECT n.* from bankcard as n where n.userId=#{userId}
+    </select>
+</mapper>

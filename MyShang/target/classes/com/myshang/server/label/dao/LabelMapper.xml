@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.label.dao.LabelDao">
+
+    <resultMap type="Label" id="labelMap">
+        <id property="labid" column="labid"/>
+        <result property="labelName" column="labelName"/>
+        <result property="labelType" column="labelType"/>
+        <result property="value" column="value"/>
+    </resultMap>
+    <select id="getLabelList" resultMap="labelMap">
+       select n.* from label as n where labelType=1
+    </select>
+    <select id="getLabelRewardList" resultMap="labelMap">
+       select n.* from label as n where labelType=2 ORDER BY n.value asc
+    </select>
+    <select id="getLabelEvaluateList" resultMap="labelMap">
+       select n.* from label as n where labelType=3
+    </select>
+    <select id="getLabelForId" resultType="String">
+       select n.labelName from label as n where labid=#{labid}
+    </select>
+    <insert id="addLabel" parameterType="Label">
+       insert into label(labelName,labelType,value)
+       values(#{labelName},#{labelType},#{value})
+    </insert>
+    <update id="updateLabel" parameterType="Label">
+		update label set labelName=#{labelName},labelType=#{labelType},value=#{value} where labid =#{labid}
+    </update>
+    <delete id="deleteLabel" parameterType="int">
+		delete from label where labid =#{labid}
+    </delete>
+</mapper>

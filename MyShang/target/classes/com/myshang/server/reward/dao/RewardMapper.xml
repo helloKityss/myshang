@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myshang.server.reward.dao.RewardDao">
+
+    <resultMap type="Reward" id="rewardMap">
+        <id property="rewid" column="rewid"/>
+        <result property="money" column="money"/>
+        <result property="roomId" column="roomId"/>
+        <result property="employeeId" column="employeeId"/>
+        <result property="employeeMoney" column="employeeMoney"/>
+        <result property="mamiId" column="mamiId"/>
+        <result property="mamiMoney" column="mamiMoney"/>
+        <result property="belongBusid" column="belongBusid"/>
+        <result property="bossMoney" column="bossMoney"/>
+        <result property="bossId" column="bossId"/>
+        <result property="platformId" column="platformId"/>
+        <result property="platformMoney" column="platformMoney"/>
+        <result property="rewardTime" column="rewardTime"/>
+        <result property="customOpenid" column="customOpenid"/>   
+        <result property="customUnionid" column="customUnionid"/> 
+        <result property="internalId" column="internalId"/>
+        <result property="internalMoney" column="internalMoney"/>
+        <result property="extendId" column="extendId"/>   
+        <result property="extendMoney" column="extendMoney"/>  
+        <result property="rewardId" column="rewardId"/>  
+    </resultMap>
+
+    <insert id="addRewardRecord" parameterType="Reward" useGeneratedKeys="true" keyProperty="rewid">
+		insert into reward_record (money,
+		<if test="roomId!=null">roomId,</if>
+		employeeId,employeeMoney,managerId,
+	    <if test="viceManagerId!=null">viceManagerId,</if>
+	    <if test="viceManagerMoney!=null">viceManagerMoney,</if>
+	    belongBusid,managerMoney,platformId,platformMoney,customOpenid,customUnionid,rewardTime) 
+		values(#{money},
+	 	<if test="roomId!=null">#{roomId},</if>
+	 	#{employeeId},#{employeeMoney},#{managerId},
+	 	<if test="viceManagerId!=null">#{viceManagerId},</if>
+	    <if test="viceManagerMoney!=null">#{viceManagerMoney},</if>
+	    #{belongBusid},#{managerMoney},#{platformId},#{platformMoney},#{customOpenid},#{customUnionid},#{rewardTime}
+	 	)
+    </insert>                
+    
+    <insert id="addRewardMoney" parameterType="Reward"  useGeneratedKeys="true" keyProperty="rewid">
+     insert into reward_record(money) values(#{money})    
+    </insert>
+    <update id="UpdateRewardRecordById" parameterType="Reward">
+     update reward_record set 
+      <if test="roomId!=null">roomId=#{roomId},</if>
+      employeeId=#{employeeId},
+      <if test="employeeMoney!=null">employeeMoney=#{employeeMoney},</if>bossId=#{bossId},
+       <if test="mamiId!=null">mamiId=#{mamiId},</if>
+	   <if test="mamiMoney!=null">mamiMoney=#{mamiMoney},</if>
+   	   internalId=#{internalId},<if test="internalMoney!=null">internalMoney=#{internalMoney},</if>
+   	   extendId=#{extendId},
+   	   <if test="extendMoney!=null">extendMoney=#{extendMoney},</if>
+	   belongBusid=#{belongBusid},bossMoney=#{bossMoney},platformId=#{platformId},platformMoney=#{platformMoney},customOpenid=#{customOpenid},customUnionid=#{customUnionid},rewardTime=#{rewardTime},rewardId=#{rewardId}
+	   where rewid=#{rewid}
+    </update>
+    <select id="getrewardCount" resultType="java.math.BigDecimal">
+	    select count(n.rewardId) from reward_record as n where n.rewardId=#{rewardId} and DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[<=date(n.rewardTime)]]>
+    </select>
+    <select id="queryRewardMoney" resultType="Integer">
+	    SELECT
+			sum( n.money ) 
+		FROM
+			reward_record AS n 
+		where 
+			n.belongBusid=#{belongBusid}
+			year(n.rewardTime)=year(now()) 
+			and
+			month(n.rewardTime)=month(now())
+			and
+			day(n.rewardTime)=day(now())
+			GROUP BY n.belongBusid
+    </select>
+    <select id="queryrewardCount" resultType="Integer">
+	    SELECT
+			count( n.rewardId ) 
+		FROM
+			reward_record AS n 
+		WHERE
+			n.belongBusid=#{belongBusid}
+			AND
+			YEAR ( n.rewardTime ) = YEAR ( now( ) ) 
+			AND MONTH ( n.rewardTime ) = MONTH ( now( ) ) 
+			AND DAY ( n.rewardTime ) = DAY ( now( ) ) 
+    </select>
+</mapper>
